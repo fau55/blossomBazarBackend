@@ -29,6 +29,9 @@ app.use(express.static("public"));
 //cors issue end
 
 // API endpoints
+app.get("/", (req,res)=>{
+  res.send("Welcome to the Backend of Blossom Bazar")
+})
 
 app.use("/api/cart", cartRouter);
 app.use("/api/product", productRouter);
