@@ -179,10 +179,18 @@ const deleteCartById = async (req, res) => {
 };
 
 const getCartbyUserId = async (req, res) => {
-  Cart.find({ userId: req.params.userId }).then((cart) => {
-    res.status(400).json({ cartProducts: cart })
-  })
-}
+  try {
+    const cart = await Cart.find({ userId: req.params.userId });
+    if (!cart || cart.length === 0) {
+      return res.status(404).json({ message: "Cart not found for the given user." });
+    }
+    res.status(200).json({ cartProducts: cart });
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ message: "An error occurred while fetching the cart.", error: error.message });
+  }
+};
+
 
 export {
   getAllCarts,
