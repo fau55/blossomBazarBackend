@@ -17,7 +17,7 @@ const getAllCarts = async (req, res) => {
 
 const addItemsInCart = async (req, res) => {
   try {
-    const { items } = req.body; // Expect items to be an array in the request body
+    const { items } = req.body;
 
     // Validate the items format
     if (!items || !Array.isArray(items)) {
@@ -26,17 +26,14 @@ const addItemsInCart = async (req, res) => {
       });
     }
 
-    // Retrieve the current cart
-    const cart = await Cart.findOne({userId :req.params.userId});
+    // Find the cart
+    const cart = await Cart.findOne({ userId: req.params.userId });
     if (!cart) {
-      return res.status(404).json({
-        message: "Cart not found.",
-      });
+      return res.status(404).json({ message: "Cart not found." });
     }
 
-    // Process each item
+    // Process items and update cart
     items.forEach((newItem) => {
-      // Validate item fields
       if (
         !newItem.productId ||
         !newItem.quantity ||
@@ -53,28 +50,19 @@ const addItemsInCart = async (req, res) => {
       );
 
       if (existingItemIndex > -1) {
-        // Update quantity if item already exists in cart
         cart.items[existingItemIndex].quantity += +newItem.quantity;
       } else {
-        // Add new item if it doesn't exist in cart
         cart.items.push(newItem);
       }
     });
 
     // Recalculate the total price
-    const totalPrice = cart.items.reduce(
-      (total, item) => total + (item.quantity * item.priceAfterDiscount || 0),
+    cart.totalPrice = cart.items.reduce(
+      (total, item) => total + item.quantity * item.priceAfterDiscount,
       0
     );
-    // Ensure totalPrice is a number
-    if (isNaN(totalPrice)) {
-      throw new Error("Total price calculation failed.");
-    }
 
-    cart.totalPrice = totalPrice;
     cart.updatedAt = new Date();
-
-    // Save the updated cart
     await cart.save();
 
     res.status(200).json({
@@ -82,7 +70,6 @@ const addItemsInCart = async (req, res) => {
       cart,
     });
   } catch (error) {
-    // Handle errors
     res.status(500).json({
       message: "An error occurred while adding items to the cart.",
       error: error.message,
