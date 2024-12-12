@@ -221,7 +221,7 @@ const getUserProfile = async (req, res) => {
     });
 };
 
-const delteUserById = async (req, res) => {
+const deleteUserById = async (req, res) => {
   User.findByIdAndDelete(req.params.id)
     .then((user) => {
       if (user) {
@@ -289,6 +289,12 @@ const otpVerification = async (req, res) => {
   }
 };
 
+const deleteAllUsers = async (req, res) => {
+  User.deleteMany().then(() => {
+    res.status(400).send("all Users Deleted Successfully!!")
+  })
+}
+
 export {
   getAllUsers,
   registerAsBuyer,
@@ -298,6 +304,7 @@ export {
   uploadUserProfile,
   editUser,
   getUserProfile,
-  delteUserById,
-  otpVerification
+  deleteUserById,
+  otpVerification,
+  deleteAllUsers
 };
