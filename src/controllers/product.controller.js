@@ -77,10 +77,18 @@ const editProduct = async (req, res) => {
       });
     });
 };
+const getProductByProductId = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.status(200).json({ productDetails: product });
+  } catch (err) {
+    console.error("Error fetching product by ID:", err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
-const getProductbyProductId = async (req, res) => {
-  Product.findById(req.params.productId).then((product) => {
-    res.status(400).json({ productDetails: product })
-  })
-}
-export { addProduct, deleteProduct, editProduct, getAllProducts, getProductbyProductId }
+
+export { addProduct, deleteProduct, editProduct, getAllProducts, getProductByProductId }
